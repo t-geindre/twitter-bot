@@ -1,0 +1,13 @@
+{
+  "name": "twitter-bot",
+  "version": "1.0.0",
+  "description": "Yet another bot for twitter!",
+  "main": "app.js",
+  "repository": "http://github.com/t-geindre/twitter-bot/",
+  "author": "Thierry Geindre",
+  "license": "MIT",
+  "dependencies": {
+    "@symfony/webpack-encore": "^0.17.1",
+    "babel-preset-es2017": "^6.24.1"
+  }
+}
