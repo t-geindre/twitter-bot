@@ -1,3 +1,5 @@
+import Ajax from '../ajax.js';
+
 export default class
 {
     constructor(baseUrl, headers = {})
@@ -8,7 +10,7 @@ export default class
 
     search(parameters = {})
     {
-        return this.jsonRequest({
+        return this.request({
             url: 'search/tweets.json',
             parameters
         });
@@ -48,7 +50,7 @@ export default class
 
     show(tweetId, parameters = {})
     {
-        return this.jsonRequest({
+        return this.request({
             url: 'statuses/show/' + tweetId + '.json',
             parameters
         });
@@ -56,7 +58,7 @@ export default class
 
     user(screenName, parameters = {})
     {
-        return this.jsonRequest({
+        return this.request({
             url: 'users/show.json',
             parameters: Object.assign(
                 { screen_name: screenName },
@@ -67,67 +69,11 @@ export default class
 
     request(options = {})
     {
-        return new Promise((resolv, reject) => {
-            options = Object.assign({
-                method: 'GET',
-                headers: this.headers,
-                url: ''
-            }, options);
+        options.url = this.baseUrl + options.url;
 
-            let url = this.baseUrl + options.url;
-            if (options.parameters) {
-                let query = Object.keys(options.parameters)
-                    .filter(k => (
-                        options.parameters[k] !== undefined
-                        && options.parameters[k] !== null
-                        && options.parameters[k] !== ''
-                    ))
-                    .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(options.parameters[k]))
-                    .join('&')
-                    .trim()
-                ;
-
-                url += query.length > 0 ? '?' + query : '';
-            }
-
-            let xhr = new XMLHttpRequest();
-            xhr.open(options.method, url, true);
-
-            Object.keys(options.headers).map(
-                k => xhr.setRequestHeader(k, options.headers[k])
-            );
-
-            xhr.withCredentials = true;
-
-            xhr.onreadystatechange = function(event) {
-                if (this.readyState === XMLHttpRequest.DONE) {
-                    let response = {
-                        data: this.responseText,
-                        status: this.status
-                    };
-
-                    if (this.status >= 200 && this.status < 300) {
-                        resolv(response);
-
-                        return;
-                    }
-
-                    reject(response);
-                }
-            };
-
-            xhr.send();
-        });
-    }
-
-    jsonRequest(options = {})
-    {
-        return this
-            .request(options)
-            .then(response => {
-                response.data = JSON.parse(response.data);
-
-                return response;
-            })
+        return Ajax(Object.assign(
+            { headers: this.headers},
+            options
+        ));
     }
 }
